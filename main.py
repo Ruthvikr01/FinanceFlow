@@ -12,8 +12,6 @@ import importlib
 import streamlit as st
 from dotenv import load_dotenv
 
-import logging_config  # noqa: F401 - configure root logging on import
-
 load_dotenv()
 
 # Ensure imports resolve to the root `app` package, not `src/app.py`.
@@ -24,11 +22,13 @@ if PROJECT_ROOT in sys.path:
 sys.path.insert(0, PROJECT_ROOT)
 if SRC_PATH in sys.path:
     sys.path.remove(SRC_PATH)
-    sys.path.append(SRC_PATH)
+sys.path.insert(0, SRC_PATH)
 
 existing_app_module = sys.modules.get("app")
 if existing_app_module is not None and not hasattr(existing_app_module, "__path__"):
     del sys.modules["app"]
+
+from src import logging_config  # noqa: F401 - configure root logging on import
 
 logger = logging.getLogger(__name__)
 
