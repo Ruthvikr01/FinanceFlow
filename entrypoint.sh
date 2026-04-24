@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Entrypoint script to run both Streamlit and health check server
 
 set -e
@@ -31,9 +31,12 @@ PY
 
 trap 'kill "$HEALTH_PID" 2>/dev/null || true' EXIT
 
+APP_PORT="${PORT:-8501}"
+echo "App port=${APP_PORT}"
+
 # Start health check server in background
 python src/health_check.py &
 HEALTH_PID=$!
 
 # Start Streamlit app in foreground
-streamlit run main.py --server.port=8501 --server.address=0.0.0.0
+streamlit run main.py --server.port="${APP_PORT}" --server.address=0.0.0.0
