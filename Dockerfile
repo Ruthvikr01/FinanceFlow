@@ -9,6 +9,8 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
+RUN pip install --no-cache-dir pdfplumber==0.11.7 plotly==6.7.0 bcrypt==5.0.0
+
 RUN python - <<'PY'
 import importlib
 
