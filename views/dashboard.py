@@ -161,14 +161,14 @@ def _render_recent_activity(user_id: int) -> None:
         category_id_by_name = {c.name: c.id for c in categories}
         category_names = [c.name for c in categories if c.name.lower() != "uncategorized"]
 
-        transactions = repo.list_transactions(session, user_id)
+        transactions = repo.list_transactions(session, user_id, limit=10)
         if not transactions:
             st.info("No recent transactions yet.")
             return
 
         uncategorized_in_recent = 0
 
-        for txn in transactions[:10]:
+        for txn in transactions:
             category_name = category_by_id.get(txn.category_id, "Uncategorized")
             source_name = (txn.source or "manual").replace("_", " ").title()
             amount_text = format_currency(txn.amount)

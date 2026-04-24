@@ -46,6 +46,22 @@ def apply_custom_css():
             background-color: #F9F8F6;
         }
 
+        /* Subtle page transition for smoother panel navigation */
+        @keyframes ff-page-enter {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        [data-testid="stAppViewContainer"] .main .block-container {
+            animation: ff-page-enter 180ms ease-out;
+            will-change: opacity, transform;
+        }
+
         /* Sidebar */
         [data-testid="stSidebar"] {
             background-color: #FFFFFF;
@@ -60,18 +76,24 @@ def apply_custom_css():
             border-radius: 8px;
             padding: 0.5rem 1.25rem;
             font-weight: 500;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.18s ease, box-shadow 0.18s ease;
         }
         .stButton > button:hover {
             background-color: #3D5535;
             color: white;
             border: none;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(44, 48, 43, 0.12);
         }
         .stButton > button:focus:not(:active) {
             background-color: #3D5535;
             color: white;
             border: none;
             box-shadow: 0 0 0 3px rgba(74, 103, 65, 0.2);
+        }
+        .stButton > button:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         /* Download button */

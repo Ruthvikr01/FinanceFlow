@@ -55,7 +55,11 @@ def process_uploaded_statement(
 
 def compute_dashboard_stats(session: Session, user_id: int) -> dict:
     """Compute aggregate stats and chart data for the dashboard."""
-    txns = session.query(Transaction).filter(Transaction.user_id == user_id).all()
+    txns = session.query(
+        Transaction.amount,
+        Transaction.transaction_date,
+        Transaction.category_id,
+    ).filter(Transaction.user_id == user_id).all()
 
     if not txns:
         return {
@@ -68,7 +72,7 @@ def compute_dashboard_stats(session: Session, user_id: int) -> dict:
         }
 
     # Load categories in one shot
-    cats = session.query(Category).all()
+    cats = session.query(Category.id, Category.name).all()
     cat_name_by_id = {c.id: c.name for c in cats}
 
     total_income = sum(t.amount for t in txns if t.amount > 0)

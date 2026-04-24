@@ -78,6 +78,7 @@ def list_transactions(
     end_date: Optional[date] = None,
     min_amount: Optional[float] = None,
     max_amount: Optional[float] = None,
+    limit: Optional[int] = None,
 ) -> list[Transaction]:
     """Get transactions with optional filters."""
     q = session.query(Transaction).filter(Transaction.user_id == user_id)
@@ -95,7 +96,10 @@ def list_transactions(
         q = q.filter(Transaction.amount >= min_amount)
     if max_amount is not None:
         q = q.filter(Transaction.amount <= max_amount)
-    return q.order_by(Transaction.transaction_date.desc(), Transaction.id.desc()).all()
+    q = q.order_by(Transaction.transaction_date.desc(), Transaction.id.desc())
+    if limit is not None:
+        q = q.limit(limit)
+    return q.all()
 
 
 def update_transaction_category(
