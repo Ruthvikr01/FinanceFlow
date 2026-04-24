@@ -7,8 +7,12 @@ Entry point with authentication and navigation.
 # - Space: O(1) framework state here, excluding session/cache and page data.
 import os
 import sys
+import logging
+import importlib
 import streamlit as st
 from dotenv import load_dotenv
+
+import logging_config  # noqa: F401 - configure root logging on import
 
 load_dotenv()
 
@@ -25,6 +29,21 @@ if SRC_PATH in sys.path:
 existing_app_module = sys.modules.get("app")
 if existing_app_module is not None and not hasattr(existing_app_module, "__path__"):
     del sys.modules["app"]
+
+logger = logging.getLogger(__name__)
+
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    try:
+        sentry_sdk = importlib.import_module("sentry_sdk")
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.1")),
+            environment=os.getenv("APP_ENV", "development"),
+        )
+        logger.info("Sentry initialized")
+    except Exception as exc:
+        logger.warning("Sentry could not be initialized: %s", exc)
 
 # Set page config FIRST (must be before any other streamlit command)
 st.set_page_config(
@@ -65,6 +84,7 @@ def _init():
             )
             session.add(admin)
             session.commit()
+            logger.info("Seeded default admin account")
     finally:
         session.close()
     return True
@@ -261,6 +281,7 @@ def render_sidebar_nav():
 
 
 def main():
+    logger.info("Starting Streamlit app")
     _restore_session_from_query()
 
     if not is_logged_in():
