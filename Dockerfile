@@ -9,6 +9,15 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
+RUN python - <<'PY'
+import importlib
+
+for module_name in ("pdfplumber", "bcrypt", "plotly"):
+    importlib.import_module(module_name)
+
+print("Verified runtime imports: pdfplumber, bcrypt, plotly")
+PY
+
 COPY . .
 
 RUN chmod +x entrypoint.sh
